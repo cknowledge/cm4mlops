@@ -111,6 +111,7 @@ deps:
 
   # Detect pycuda
   - tags: get,generic-python-lib,_pycuda
+    version: "2022.2.2"
     skip_if_env:
       CM_RUN_STATE_DOCKER:
         - 'yes'
@@ -217,7 +218,6 @@ versions:
         version: r3.0
       nvidia-scratch-space:
         tags: _version.3_0
-
   r3.1:
     add_deps_recursive:
       nvidia-inference-common-code:
@@ -240,6 +240,26 @@ versions:
       nvidia-inference-common-code:
         version: r4.0
       nvidia-scratch-space:
+        tags: _version.4_0
+    default_env:
+      BUILD_TRTLLM: 1
+    deps:
+      - tags: get,generic,sys-util,_nlohmann-json3-dev
+      - tags: get,generic,sys-util,_git-lfs
+      - tags: install,pytorch,from.src,_for-nvidia-mlperf-inference-v4.0
+        names:
+        - pytorch
+        - torch
+      - tags: install,torchvision,from.src,_for-nvidia-mlperf-inference-v4.0
+        names:
+        - pytorchvision
+        - torchvision
+
+  r4.1-dev:
+    add_deps_recursive:
+      nvidia-inference-common-code:
+        version: r4.0
+      nvidia-scratch-space:
         tags: _version.4_1
     default_env:
       BUILD_TRTLLM: 1
@@ -254,6 +274,15 @@ versions:
         names:
         - pytorchvision
         - torchvision
+  
+  r4.1:
+    add_deps_recursive:
+      nvidia-inference-common-code:
+        version: r4.1
+      nvidia-scratch-space:
+        tags: _version.4_1
+    default_env:
+      BUILD_TRTLLM: 1
 
 docker:
   skip_run_cmd: 'no'

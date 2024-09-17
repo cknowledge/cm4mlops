@@ -262,6 +262,9 @@ deps:
       CM_MLPERF_NVIDIA_HARNESS_RUN_MODE:
       - run_harness
 
+  - tags: get,generic-python-lib,_package.pycuda
+    version: "2022.2.2"
+
   - tags: get,generic-python-lib,_package.nvmitten
     update_tags_from_env_with_prefix:
       _path.:
@@ -313,9 +316,25 @@ post_deps:
 # Variations to customize dependencies
 variations:
   # MLPerf inference version
-  v4.0:
+  v4.1:
+    group: version
+    env:
+      CM_MLPERF_INFERENCE_CODE_VERSION: "v4.1"
+    adr:
+      pytorch:
+        tags: _for-nvidia-mlperf-inference-v4.1
+ 
+  v4.1-dev:
     group: version
     default: true
+    env:
+      CM_MLPERF_INFERENCE_CODE_VERSION: "v4.0"
+    adr:
+      pytorch:
+        tags: _for-nvidia-mlperf-inference-v4.0
+
+  v4.0:
+    group: version
     env:
       CM_MLPERF_INFERENCE_CODE_VERSION: "v4.0"
       CM_MLPERF_GPTJ_MODEL_FP8_PATH_SUFFIX: GPTJ-FP8-quantized
@@ -329,6 +348,7 @@ variations:
     adr:
       pytorch:
         tags: _for-nvidia-mlperf-inference-v3.1
+  
   # Target devices
   cpu:
     group: device
@@ -451,6 +471,14 @@ variations:
         names:
           - scipy
         version: 1.10.1
+
+  sdxl,v4.1:
+    deps:
+    - tags: get,generic-python-lib,_package.torchrec
+      version: 0.4.0
+    - tags: get,generic-python-lib,_package.torchmetrics
+      version: 1.0.3
+    - tags: get,generic-python-lib,_package.typeguard
 
   bert_:
     deps:
