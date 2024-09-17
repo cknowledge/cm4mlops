@@ -54,7 +54,7 @@ def preprocess(i):
         else:
             env['CM_NUM_THREADS'] = env.get('CM_HOST_CPU_TOTAL_CORES', '1')
 
-    if env.get('CM_MLPERF_LOADGEN_MAX_BATCHSIZE','') != '' and not env.get('CM_MLPERF_MODEL_SKIP_BATCHING', False):
+    if env.get('CM_MLPERF_LOADGEN_MAX_BATCHSIZE','') != '' and str(env.get('CM_MLPERF_MODEL_SKIP_BATCHING', False)).lower() not in [ "true", "1", "yes"] :
         env['CM_MLPERF_LOADGEN_EXTRA_OPTIONS'] += " --max-batchsize " + str(env['CM_MLPERF_LOADGEN_MAX_BATCHSIZE'])
 
     if env.get('CM_MLPERF_LOADGEN_BATCH_SIZE','') != '':
@@ -125,6 +125,10 @@ def preprocess(i):
             env['DATA_DIR'] = env.get('CM_DATASET_PREPROCESSED_PATH')
         else:
             env['DATA_DIR'] = env.get('CM_DATASET_PATH')
+
+        if "dlrm" in env['CM_MODEL']:
+            env['DATA_DIR'] = env['CM_CRITEO_PREPROCESSED_PATH']
+
         dataset_options = ''
 
     if env.get('CM_MLPERF_EXTRA_DATASET_ARGS','') != '':
@@ -318,6 +322,7 @@ def get_run_cmd_reference(os_info, env, scenario_extra_options, mode_extra_optio
             cmd += f" --num-workers {env['CM_MLPERF_INFERENCE_NUM_WORKERS']}"
 
         cmd = cmd.replace("--count", "--total-sample-count")
+        cmd = cmd.replace("--max-batchsize", "--batch-size")
     
     elif "mixtral-8x7b" in env['CM_MODEL']:
         env['RUN_DIR'] = os.path.join(env['CM_MLPERF_INFERENCE_SOURCE'], "language", "mixtral-8x7b")
@@ -349,15 +354,13 @@ def get_run_cmd_reference(os_info, env, scenario_extra_options, mode_extra_optio
 
     elif "dlrm" in env['CM_MODEL']: # DLRM is in draft stage
 
-        env['RUN_DIR'] = os.path.join(env['CM_MLPERF_INFERENCE_DLRM_PATH'], "..", "dlrm_v2", "pytorch")
-        if 'terabyte' in env['CM_ML_MODEL_DATASET']:
-            dataset = "terabyte"
-        elif 'kaggle' in env['CM_ML_MODEL_DATASET']:
-            dataset = "kaggle"
-        elif 'multihot-criteo-sample' in env['CM_ML_MODEL_DATASET']:
+        env['RUN_DIR'] = os.path.join(env['CM_MLPERF_INFERENCE_DLRM_V2_PATH'], "pytorch")
+        if 'multihot-criteo-sample' in env['CM_ML_MODEL_DATASET_TYPE']:
             dataset = "multihot-criteo-sample"
-        elif 'multihot-criteo' in env['CM_ML_MODEL_DATASET']:
+        elif 'multihot-criteo' in env['CM_ML_MODEL_DATASET_TYPE']:
             dataset = "multihot-criteo"
+
+        env['MODEL_DIR'] = os.path.join(env['MODEL_DIR'], "model_weights")
 
         if env.get('CM_MLPERF_BIN_LOADER', '') == 'yes':
             mlperf_bin_loader_string = " --mlperf-bin-loader"
