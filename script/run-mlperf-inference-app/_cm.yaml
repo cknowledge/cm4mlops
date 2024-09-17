@@ -36,6 +36,7 @@ default_env:
   CM_MLPERF_RUN_STYLE: test
 
 input_mapping:
+  api_server: CM_MLPERF_INFERENCE_API_SERVER
   backend: CM_MLPERF_BACKEND
   batch_size: CM_MLPERF_LOADGEN_MAX_BATCHSIZE
   beam_size: GPTJ_BEAM_SIZE
@@ -98,6 +99,11 @@ input_mapping:
   sut: CM_MLPERF_INFERENCE_SUT_VARIATION
   nvidia_llama2_dataset_file_path: CM_NVIDIA_LLAMA_DATASET_FILE_PATH
   tp_size: CM_NVIDIA_TP_SIZE
+  vllm_model_name: CM_VLLM_SERVER_MODEL_NAME
+  num_workers: CM_MLPERF_INFERENCE_NUM_WORKERS
+  max_test_duration: CM_MLPERF_MAX_DURATION_TEST
+  all_models: CM_MLPERF_ALL_MODELS
+  criteo_day23_raw_data_path: CM_CRITEO_DAY23_RAW_DATA_PATH
 
 new_state_keys:
 - app_mlperf_inference_*
@@ -120,6 +126,8 @@ deps:
   - inference-src
   tags: get,mlcommons,inference,src
 - tags: get,sut,description
+  skip_if_env:
+    CM_MLPERF_USE_DOCKER: [ on ]
 
 - tags: get,mlperf,inference,results,dir
   names:
@@ -274,6 +282,13 @@ variations:
     env:
       CM_MLPERF_INFERENCE_VERSION: '4.1'
       CM_RUN_MLPERF_INFERENCE_APP_DEFAULTS: r4.1_default
+    adr:
+      get-mlperf-inference-results-dir:
+        version: "r4.1"
+      get-mlperf-inference-submission-dir:
+        version: "r4.1"
+      mlperf-inference-nvidia-scratch-space:
+        version: "r4.1"
     group: benchmark-version
 
   short:
